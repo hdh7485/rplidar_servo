@@ -6,21 +6,25 @@
 #define KP 1.5
 
 // You need to create an driver instance
-Servo steer_servo;
+Servo steerServo;
+Servo throttleMotor;
 RPLidar lidar;
 
 // Change the pin mapping based on your needs.
 /////////////////////////////////////////////////////////////////////////////
-#define RPLIDAR_MOTOR 3 // The PWM pin for control the speed of RPLIDAR's motor.
+#define RPLIDAR_MOTOR  3 // The PWM pin for control the speed of RPLIDAR's motor.
 // This pin should connected with the RPLIDAR's MOTOCTRL signal
-#define STEER_SERVO   7 // The PWM pin for contorl the angle of steering servo motor.
+#define STEER_SERVO    7 // The PWM pin for contorl the angle of steering servo motor.
+// This pin should connected with the servo motor's signal pin(white).
+#define THROTTLE_MOTOR 8 // The PWM pin for contorl the speed of throttle dc motor.
 // This pin should connected with the servo motor's signal pin(white).
 //////////////////////////////////////////////////////////////////////////////
 void setup() {
   // bind the RPLIDAR driver to the arduino hardware serial
   Serial.begin(115200);
   lidar.begin(Serial3);
-  steer_servo.attach(STEER_SERVO);
+  steerServo.attach(STEER_SERVO);
+  throttleMotor.attach(THROTTLE_MOTOR);
 
   // set pin modes
   pinMode(RPLIDAR_MOTOR, OUTPUT);
@@ -34,9 +38,15 @@ int decideDistance = 0;
 float lidarDistance[360] = {0,};
 float rightDistance[90] = {300,};
 float leftDistance[89] = {300,};
-float steerAngle = 0;
+int steerAngle = 0;
+int throttleSpeed = 1600;
 
 void loop() {
+  if(throttleSpeed > 1500){
+    throttleSpeed -= 1;
+  }
+  throttleMotor.write(throttleSpeed);
+  
   if (IS_OK(lidar.waitPoint())) {
     //perform data processing here...
     float distance = lidar.getCurrentPoint().distance;
@@ -59,7 +69,7 @@ void loop() {
       Serial.println(angleAtMaxDist);
 #endif
       steerAngle = 90 + angleAtMaxDist * KP;
-      steer_servo.write(steerAngle);
+      steerServo.write(steerAngle);
       minDistance = 100000;
       maxDistance = 0;
       angleAtMinDist = 0;
@@ -76,7 +86,8 @@ void loop() {
         leftDistance[-(index - 359)] = distance;
       }
     }
-  } else {
+  }
+  else {
     analogWrite(RPLIDAR_MOTOR, 0); //stop the rplidar motor
 
     // try to detect RPLIDAR...
