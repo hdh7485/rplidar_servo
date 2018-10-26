@@ -39,12 +39,12 @@ float lidarDistance[360] = {0,};
 float rightDistance[90] = {300,};
 float leftDistance[89] = {300,};
 int steerAngle = 0;
-int throttleSpeed = 1600;
+int throttleSpeed = 1515;
 
 void loop() {
-  if(throttleSpeed > 1500){
-    throttleSpeed -= 1;
-  }
+//  if(throttleSpeed > 1450){
+//    throttleSpeed -= 1;
+//  }
   throttleMotor.write(throttleSpeed);
   
   if (IS_OK(lidar.waitPoint())) {
@@ -68,7 +68,7 @@ void loop() {
       Serial.println(' ');
       Serial.println(angleAtMaxDist);
 #endif
-      steerAngle = 90 + angleAtMaxDist * KP;
+      steerAngle = 85 + angleAtMaxDist * KP;
       steerServo.write(steerAngle);
       minDistance = 100000;
       maxDistance = 0;
