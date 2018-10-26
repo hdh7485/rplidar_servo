@@ -1,13 +1,13 @@
 # RPLIDAR servo
-This code was made for RC car avoids obstacles. This algorithm detect only 0 to 90 degrees.
+This code was made for RC car avoids obstacles. This algorithm use only 0 to 90 degrees from lidar data.
 ## Prerequisite
 ### Hardware
 0. Arduino Mega 2560(I used 2 serial bus)
-1. RPLIDAR A1 or A2(tested both of them. A2 better.)
+1. RPLIDAR A1 or A2(tested both of them. A2 works better.)
 2. Servo motor
 3. PC(I used Windows 10)
 
-### Hardware pins
+### Arduino pins
 Devices|pin number
 --------|---------
 RPLIDAR|3 
