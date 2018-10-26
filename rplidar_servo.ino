@@ -1,54 +1,9 @@
-/*
-   RoboPeak RPLIDAR Arduino Example
-   This example shows how to control an RGB led based on the scan data of the RPLIDAR
-
-   The RGB led will change its hue based on the direction of the closet object RPLIDAR has been detected.
-   Also, the light intensity changes according to the object distance.
-
-   USAGE:
-   ---------------------------------
-   1. Download this sketch code to your Arduino board
-   2. Connect the RPLIDAR's serial port (RX/TX/GND) to your Arduino board (Pin 0 and Pin1)
-   3. Connect the RPLIDAR's motor ctrl pin to the Arduino board pin 3
-   4. Connect an RGB LED to your Arduino board, with the Red led to pin 9, Blue led to pin 10, Green led to pin 11
-   5. Connect the required power supplies.
-   6. RPLIDAR will start rotating when the skecth code has successfully detected it.
-   7. Remove objects within the 0.5 meters' radius circule range of the RPLIDAR
-   8. Place some object inside the 0.5 meters' range, check what will happen to the RGB led :)
-*/
-
-/*
-   Copyright (c) 2014, RoboPeak
-   All rights reserved.
-   RoboPeak.com
-
-   Redistribution and use in source and binary forms, with or without modification,
-   are permitted provided that the following conditions are met:
-
-   1. Redistributions of source code must retain the above copyright notice,
-      this list of conditions and the following disclaimer.
-
-   2. Redistributions in binary form must reproduce the above copyright notice,
-      this list of conditions and the following disclaimer in the documentation
-      and/or other materials provided with the distribution.
-
-   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
-   EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-   OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
-   SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
-   OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-   HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
-   TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
-   EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-*/
-
-// This sketch code is based on the RPLIDAR driver library provided by RoboPeak
 #include <Servo.h>
+// This sketch code is based on the RPLIDAR driver library provided by RoboPeak
 #include <RPLidar.h>
 
-#define DEBUG
+//#define DEBUG
+#define KP 1.5
 
 // You need to create an driver instance
 Servo steer_servo;
@@ -58,7 +13,7 @@ RPLidar lidar;
 /////////////////////////////////////////////////////////////////////////////
 #define RPLIDAR_MOTOR 3 // The PWM pin for control the speed of RPLIDAR's motor.
 // This pin should connected with the RPLIDAR's MOTOCTRL signal
-#define STEER_SERVO   9 // The PWM pin for contorl the angle of steering servo motor.
+#define STEER_SERVO   7 // The PWM pin for contorl the angle of steering servo motor.
 // This pin should connected with the servo motor's signal pin(white).
 //////////////////////////////////////////////////////////////////////////////
 void setup() {
@@ -79,6 +34,7 @@ int decideDistance = 0;
 float lidarDistance[360] = {0,};
 float rightDistance[90] = {300,};
 float leftDistance[89] = {300,};
+float steerAngle = 0;
 
 void loop() {
   if (IS_OK(lidar.waitPoint())) {
@@ -102,7 +58,8 @@ void loop() {
       Serial.println(' ');
       Serial.println(angleAtMaxDist);
 #endif
-      steer_servo.write(90 + angleAtMaxDist); steer_servo.write(90 + angleAtMaxDist);
+      steerAngle = 90 + angleAtMaxDist * KP;
+      steer_servo.write(steerAngle);
       minDistance = 100000;
       maxDistance = 0;
       angleAtMinDist = 0;
