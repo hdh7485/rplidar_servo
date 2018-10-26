@@ -12,6 +12,7 @@ Devices|pin number
 --------|---------
 RPLIDAR|3 
 Servo motor pwm|7
+Throttle motor pwm|8
 
 ### Software
 0. Arduino IDE
@@ -26,4 +27,6 @@ Servo motor pwm|7
 ## Upload to arduino
 0. Launch Arduino IDE
 1. Open rplidar_servo.ino
-2. Press Ctrl+u
+2. Set the arduino board to Arudino Mega 2560
+3. Set the COM port(serial port) 
+4. Press Ctrl+u
