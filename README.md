@@ -11,7 +11,7 @@ This code was made for RC car avoids obstacles. This algorithm detect only 0 to 
 Devices|pin number
 --------|---------
 RPLIDAR|3 
-Servo motor pwm|9
+Servo motor pwm|7
 
 ### Software
 0. Arduino IDE
