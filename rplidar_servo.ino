@@ -4,6 +4,7 @@
 
 //#define DEBUG
 #define KP 1.5
+#define LEFT_KP 1
 
 // You need to create an driver instance
 Servo steerServo;
@@ -38,8 +39,10 @@ int decideDistance = 0;
 float lidarDistance[360] = {0,};
 float rightDistance[90] = {300,};
 float leftDistance[89] = {300,};
+int leftDetectedAngle = 0;
 int steerAngle = 0;
 int throttleSpeed = 1515;
+int obstacleDetected = 0;
 
 void loop() {
 //  if(throttleSpeed > 1450){
@@ -52,12 +55,17 @@ void loop() {
     float distance = lidar.getCurrentPoint().distance;
     float angle = lidar.getCurrentPoint().angle;
     if (lidar.getCurrentPoint().startBit) {
+      for (int k = 9; k >= 0; k--){
+        if (leftDistance[k] < 1000){
+          leftDetectedAngle = 10-k;
+          obstacleDetected = 1;
+        }
+      }
       for (int i = 0; i < 90; i++) {
-        if (rightDistance[i] >= 1000
-        && !decideDistance) {
+        if (rightDistance[i] >= 1000) {
           maxDistance = rightDistance[i];
           angleAtMaxDist = i;
-          decideDistance = 1;
+          break;
         }
 #ifdef DEBUG
         Serial.print(rightDistance[i]);
@@ -68,13 +76,17 @@ void loop() {
       Serial.println(' ');
       Serial.println(angleAtMaxDist);
 #endif
-      steerAngle = 85 + angleAtMaxDist * KP;
+      if (angleAtMaxDist < 5 && obstacleDetected == 1)
+        steerAngle = 85 + leftDetectedAngle * LEFT_KP;
+      else
+        steerAngle = 85 + angleAtMaxDist * KP;
+
       steerServo.write(steerAngle);
       minDistance = 100000;
       maxDistance = 0;
       angleAtMinDist = 0;
       angleAtMaxDist = 0;
-      decideDistance = 0;
+      obstacleDetected = 0;
     }
     else {
       int index = (int)angle;
